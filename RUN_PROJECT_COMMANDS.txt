@@ -1,0 +1,405 @@
+================================================================================
+    COMPLETE STEP-BY-STEP COMMANDS TO RUN THE PROJECT
+    AI Recruitment Platform - Setup and Run Guide
+================================================================================
+
+PREREQUISITES CHECK
+================================================================================
+
+Step 1: Verify Python Installation
+-----------------------------------
+python --version
+(Should show Python 3.8 or higher)
+
+Step 2: Verify Node.js Installation
+------------------------------------
+node --version
+npm --version
+(Should show Node.js 16+ and npm)
+
+Step 3: Navigate to Project Directory
+-------------------------------------
+cd "D:\College\FinalYearProject\TRY 2"
+
+
+================================================================================
+ENVIRONMENT SETUP
+================================================================================
+
+Step 4: Create Backend Environment File
+----------------------------------------
+cd backend
+
+Create .env file with the following content:
+(Use Notepad or any text editor)
+
+SUPABASE_URL=https://qwuttcuazqfiimepccpa.supabase.co
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3dXR0Y3VhenFmaWltZXBjY3BhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDc3NDIsImV4cCI6MjA3ODY4Mzc0Mn0.17dfUyH7LN1y54WaG6AlPw3HcU-veDUoEW_s_oKCrnU
+JWT_SECRET=super-secret-key-change-in-production
+JWT_EXP_MINUTES=120
+FRONTEND_ORIGIN=http://localhost:5173
+PORT=5001
+UPLOAD_FOLDER=resumes
+
+OR use PowerShell command:
+--------------------------
+@"
+SUPABASE_URL=https://qwuttcuazqfiimepccpa.supabase.co
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3dXR0Y3VhenFmaWltZXBjY3BhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDc3NDIsImV4cCI6MjA3ODY4Mzc0Mn0.17dfUyH7LN1y54WaG6AlPw3HcU-veDUoEW_s_oKCrnU
+JWT_SECRET=super-secret-key-change-in-production
+JWT_EXP_MINUTES=120
+FRONTEND_ORIGIN=http://localhost:5173
+PORT=5001
+UPLOAD_FOLDER=resumes
+"@ | Out-File -FilePath .env -Encoding ASCII -NoNewline
+
+Step 5: Create Frontend Environment File (Optional)
+---------------------------------------------------
+cd ..
+
+Create .env file in project root with:
+VITE_API_BASE_URL=http://localhost:5001
+
+OR use PowerShell command:
+--------------------------
+@"
+VITE_API_BASE_URL=http://localhost:5001
+"@ | Out-File -FilePath .env -Encoding ASCII -NoNewline
+
+
+================================================================================
+INSTALL DEPENDENCIES
+================================================================================
+
+Step 6: Install Backend Dependencies
+-------------------------------------
+cd backend
+pip install -r requirements.txt
+
+Expected output: All packages installed successfully
+Packages installed:
+- Flask==2.3.3
+- flask-cors==4.0.0
+- PyPDF2==3.0.1
+- Werkzeug==2.3.7
+- supabase>=2.24.0
+- bcrypt==4.1.2
+- PyJWT>=2.10.1
+- python-dotenv==1.0.1
+- websockets>=15.0.1
+
+If you get permission errors, use:
+pip install --user -r requirements.txt
+
+Step 7: Install Frontend Dependencies
+--------------------------------------
+cd ..
+npm install
+
+Expected output: All packages installed successfully
+This may take 2-5 minutes depending on internet speed.
+
+
+================================================================================
+VERIFY SETUP
+================================================================================
+
+Step 8: Verify Environment Variables are Loaded
+------------------------------------------------
+cd backend
+python -c "from dotenv import load_dotenv; import os; load_dotenv(); print('SUPABASE_URL:', os.getenv('SUPABASE_URL')); print('SUPABASE_KEY loaded:', 'Yes' if os.getenv('SUPABASE_KEY') else 'No')"
+
+Expected output:
+SUPABASE_URL: https://qwuttcuazqfiimepccpa.supabase.co
+SUPABASE_KEY loaded: Yes
+
+Step 9: Verify Resumes Folder Exists
+-------------------------------------
+cd backend
+Test-Path resumes
+
+Expected output: True
+(If False, create it: mkdir resumes)
+
+
+================================================================================
+RUN THE PROJECT
+================================================================================
+
+IMPORTANT: You need TWO terminal windows open - one for backend, one for frontend
+
+TERMINAL 1: Start Backend Server
+================================================================================
+
+Step 10: Navigate to Backend Directory
+---------------------------------------
+cd "D:\College\FinalYearProject\TRY 2\backend"
+
+Step 11: Start Backend Server
+------------------------------
+python app.py
+
+Expected output:
+ * Serving Flask app 'app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://[your-ip]:5001
+Press CTRL+C to quit
+
+KEEP THIS TERMINAL OPEN!
+
+
+TERMINAL 2: Start Frontend Server
+================================================================================
+
+Step 12: Open a NEW Terminal/PowerShell Window
+-----------------------------------------------
+(Keep Terminal 1 running in the background)
+
+Step 13: Navigate to Project Root
+----------------------------------
+cd "D:\College\FinalYearProject\TRY 2"
+
+Step 14: Start Frontend Development Server
+-------------------------------------------
+npm run dev
+
+Expected output:
+  VITE v5.4.19  ready in 358 ms
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+
+KEEP THIS TERMINAL OPEN!
+
+
+================================================================================
+VERIFY SERVERS ARE RUNNING
+================================================================================
+
+Step 15: Test Backend Health (In a NEW Terminal)
+-------------------------------------------------
+Invoke-RestMethod -Uri http://localhost:5001/health -Method GET
+
+Expected output:
+status
+----
+ok
+
+OR use curl:
+curl http://localhost:5001/health
+
+Expected output:
+{"status":"ok"}
+
+Step 16: Check Ports are Listening
+-----------------------------------
+netstat -ano | Select-String ":5001|:5173"
+
+Expected output should show:
+- TCP listening on port 5001 (Backend)
+- TCP listening on port 5173 (Frontend)
+
+
+================================================================================
+ACCESS THE APPLICATION
+================================================================================
+
+Step 17: Open Browser
+----------------------
+Open your web browser and navigate to:
+
+http://localhost:5173
+
+You should see the application homepage!
+
+
+================================================================================
+TESTING THE APPLICATION
+================================================================================
+
+Step 18: Test Registration
+---------------------------
+1. Click "Register" or "Sign Up" button
+2. Fill in the registration form:
+   - Email: test@example.com
+   - Password: testpassword123
+   - User Type: Job Seeker or Recruiter
+   - First Name: Test
+   - Last Name: User
+3. Click "Register"
+4. You should be automatically logged in
+
+Step 19: Test Login
+-------------------
+1. If logged out, click "Login"
+2. Enter credentials:
+   - Email: test@example.com
+   - Password: testpassword123
+3. Click "Login"
+4. You should be redirected to dashboard
+
+Step 20: Verify Database Connection
+------------------------------------
+1. Go to https://supabase.com/dashboard
+2. Select your project
+3. Go to Table Editor → users
+4. You should see your registered user
+
+
+================================================================================
+TROUBLESHOOTING COMMANDS
+================================================================================
+
+If Backend Fails to Start:
+---------------------------
+1. Check if port 5001 is already in use:
+   netstat -ano | Select-String ":5001"
+   
+2. If port is in use, change PORT in backend/.env to 5002:
+   PORT=5002
+   
+3. Verify .env file exists and has correct values:
+   cd backend
+   Get-Content .env
+
+4. Test environment variable loading:
+   python -c "from dotenv import load_dotenv; import os; load_dotenv(); print('SUPABASE_URL:', os.getenv('SUPABASE_URL'))"
+
+If Frontend Fails to Start:
+----------------------------
+1. Check if port 5173 is already in use:
+   netstat -ano | Select-String ":5173"
+
+2. Delete node_modules and reinstall:
+   Remove-Item -Recurse -Force node_modules
+   Remove-Item package-lock.json
+   npm install
+
+3. Clear npm cache:
+   npm cache clean --force
+   npm install
+
+If Environment Variables Not Loading:
+-------------------------------------
+1. Recreate .env file with ASCII encoding:
+   cd backend
+   @"
+   SUPABASE_URL=https://qwuttcuazqfiimepccpa.supabase.co
+   SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3dXR0Y3VhenFmaWltZXBjY3BhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDc3NDIsImV4cCI6MjA3ODY4Mzc0Mn0.17dfUyH7LN1y54WaG6AlPw3HcU-veDUoEW_s_oKCrnU
+   JWT_SECRET=super-secret-key-change-in-production
+   JWT_EXP_MINUTES=120
+   FRONTEND_ORIGIN=http://localhost:5173
+   PORT=5001
+   UPLOAD_FOLDER=resumes
+   "@ | Out-File -FilePath .env -Encoding ASCII -NoNewline
+
+If Database Connection Fails:
+------------------------------
+1. Verify Supabase project is active:
+   - Go to https://supabase.com/dashboard
+   - Check project status
+
+2. Verify credentials in .env file match Supabase dashboard:
+   - Settings → API → Project URL
+   - Settings → API → anon public key
+
+3. Test connection:
+   cd backend
+   python test_connection.py
+
+
+================================================================================
+STOPPING THE SERVERS
+================================================================================
+
+To Stop Backend Server:
+-----------------------
+1. Go to Terminal 1 (where backend is running)
+2. Press CTRL+C
+3. Confirm if prompted
+
+To Stop Frontend Server:
+-------------------------
+1. Go to Terminal 2 (where frontend is running)
+2. Press CTRL+C
+3. Confirm if prompted
+
+To Stop All Python Processes:
+-------------------------------
+Get-Process python | Stop-Process
+
+To Stop All Node Processes:
+----------------------------
+Get-Process node | Stop-Process
+
+
+================================================================================
+QUICK START (After Initial Setup)
+================================================================================
+
+Once everything is set up, you only need these commands:
+
+TERMINAL 1 - Backend:
+---------------------
+cd "D:\College\FinalYearProject\TRY 2\backend"
+python app.py
+
+TERMINAL 2 - Frontend:
+----------------------
+cd "D:\College\FinalYearProject\TRY 2"
+npm run dev
+
+Then open: http://localhost:5173
+
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+1. Always run backend and frontend in SEPARATE terminal windows
+2. Keep both terminals open while using the application
+3. Backend must be running before frontend can make API calls
+4. If you change .env file, restart the backend server
+5. If you change frontend code, Vite will auto-reload
+6. If you change backend code, restart the backend server
+7. Never commit .env files to Git (they contain sensitive credentials)
+
+
+================================================================================
+PROJECT STRUCTURE
+================================================================================
+
+D:\College\FinalYearProject\TRY 2\
+├── backend\
+│   ├── app.py              # Main backend application
+│   ├── .env                # Backend environment variables (CREATE THIS)
+│   ├── requirements.txt   # Python dependencies
+│   └── resumes\            # Uploaded resume files
+├── src\                     # Frontend React source code
+├── .env                     # Frontend environment variables (optional)
+├── package.json            # Frontend dependencies
+└── node_modules\           # Installed frontend packages
+
+
+================================================================================
+SUCCESS INDICATORS
+================================================================================
+
+✅ Backend running: "Running on http://127.0.0.1:5001"
+✅ Frontend running: "Local: http://localhost:5173/"
+✅ Health check: {"status":"ok"}
+✅ Application loads in browser
+✅ Registration creates user in Supabase
+✅ Login works and redirects to dashboard
+
+
+================================================================================
+END OF GUIDE
+================================================================================
+
+For detailed setup instructions on a new laptop, see: SETUP_ON_NEW_LAPTOP.md
+For troubleshooting, see: RUN_PROJECT_STEPS.md
+
+
