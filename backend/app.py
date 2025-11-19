@@ -2,8 +2,10 @@ import os
 import re
 import glob
 import uuid
+import time
 from datetime import datetime, timedelta
 from functools import wraps
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import bcrypt
 import jwt
@@ -13,6 +15,8 @@ from flask import Flask, request, jsonify, g
 from flask_cors import CORS
 from supabase import create_client, Client
 from werkzeug.utils import secure_filename
+
+import requests  # used for external API proxy fetches
 
 load_dotenv()
 
@@ -275,6 +279,112 @@ def health():
     return jsonify({"status": "ok"}), 200
 
 
+# -------------------------
+# External jobs aggregator
+# -------------------------
+# In-memory cache to limit upstream calls
+_EXTERNAL_JOBS_CACHE = None
+_EXTERNAL_JOBS_CACHE_AT = 0
+_EXTERNAL_JOBS_TTL = 60 * 5  # 5 minutes
+
+def _fetch_remotive(timeout=10):
+    url = "https://remotive.com/api/remote-jobs"
+    try:
+        r = requests.get(url, timeout=timeout)
+        r.raise_for_status()
+        return r.json() if r.content else {"jobs": []}
+    except Exception as e:
+        app.logger.warning("Remotive fetch failed: %s", e)
+        return {"jobs": []}
+
+
+def _fetch_arbeitnow(timeout=10):
+    url = "https://www.arbeitnow.com/api/job-board-api"
+    try:
+        r = requests.get(url, timeout=timeout)
+        r.raise_for_status()
+        j = r.json() if r.content else {}
+        if isinstance(j, list):
+            return {"data": j}
+        if "data" in j:
+            return {"data": j.get("data", [])}
+        return {"data": j.get("jobs", [])}
+    except Exception as e:
+        app.logger.warning("ArbeitNow fetch failed: %s", e)
+        return {"data": []}
+
+
+def _fetch_adzuna(timeout=10):
+    adz_id = os.environ.get("ADZUNA_APP_ID")
+    adz_key = os.environ.get("ADZUNA_APP_KEY")
+    if not adz_id or not adz_key:
+        return {"results": []}
+
+    ADZUNA_COUNTRY = "in"
+    base = f"https://api.adzuna.com/v1/api/jobs/{ADZUNA_COUNTRY}/search/1"
+    params = {
+        "app_id": adz_id,
+        "app_key": adz_key,
+        "results_per_page": 50,
+        "where": "India"
+    }
+    try:
+        r = requests.get(base, params=params, timeout=timeout)
+        r.raise_for_status()
+        return r.json() if r.content else {"results": []}
+    except Exception as e:
+        app.logger.warning("Adzuna fetch failed: %s", e)
+        return {"results": []}
+
+
+@app.route("/api/external-jobs", methods=["GET"])
+def external_jobs():
+    """
+    Aggregates Remotive + ArbeitNow + (optional) Adzuna India.
+    Returns JSON with keys:
+      { remotive: { jobs: [...] }, arbeitnow: { data: [...] }, adzuna: { results: [...] } }
+    Uses a memory cache for _EXTERNAL_JOBS_TTL seconds.
+    """
+    global _EXTERNAL_JOBS_CACHE, _EXTERNAL_JOBS_CACHE_AT
+
+    now_ts = int(time.time())
+    if _EXTERNAL_JOBS_CACHE and (now_ts - _EXTERNAL_JOBS_CACHE_AT) < _EXTERNAL_JOBS_TTL:
+        return jsonify(_EXTERNAL_JOBS_CACHE), 200
+
+    results = {
+        "remotive": {"jobs": []},
+        "arbeitnow": {"data": []},
+        "adzuna": {"results": []}
+    }
+
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        futures = {
+            ex.submit(_fetch_remotive): "remotive",
+            ex.submit(_fetch_arbeitnow): "arbeitnow",
+            ex.submit(_fetch_adzuna): "adzuna",
+        }
+        for fut in as_completed(futures):
+            key = futures[fut]
+            try:
+                data = fut.result()
+                if key == "remotive":
+                    results["remotive"] = data if isinstance(data, dict) else {"jobs": data}
+                elif key == "arbeitnow":
+                    results["arbeitnow"] = data if isinstance(data, dict) else {"data": data}
+                else:
+                    results["adzuna"] = data if isinstance(data, dict) else {"results": data}
+            except Exception as e:
+                app.logger.warning("external fetch exception for %s: %s", key, e)
+
+    _EXTERNAL_JOBS_CACHE = results
+    _EXTERNAL_JOBS_CACHE_AT = int(time.time())
+
+    return jsonify(results), 200
+# -------------------------
+# End external jobs aggregator
+# -------------------------
+
+
 @app.route('/', methods=['GET'])
 def root():
     return jsonify({
@@ -287,6 +397,7 @@ def root():
             "/api/auth/me",
             "/upload",
             "/shortlist",
+            "/api/external-jobs"
         ]
     }), 200
 

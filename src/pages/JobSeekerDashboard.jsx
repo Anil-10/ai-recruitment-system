@@ -10,6 +10,9 @@ import DashboardNav from "../components/DashboardNav";
 import { showSuccess } from "../utils/toast";
 import './Dashboard.css';
 
+// new external jobs component (you created this file earlier)
+import ExternalAvailableJobs from "../components/ExternalAvailableJobs";
+
 function formatPostedDate(createdAt) {
   if (!createdAt) return "Not available";
 
@@ -169,10 +172,11 @@ function JobSeekerDashboard() {
   };
 
   const handleLogout = () => {
-  logout();
-  showSuccess("Logged out successfully!");
-  navigate("/login");
-};
+    logout();
+    showSuccess("Logged out successfully!");
+    navigate("/login");
+  };
+
   const handleQuickApply = (jobId, jobTitle) => {
     if (!user) {
       navigate('/login');
@@ -483,7 +487,7 @@ function JobSeekerDashboard() {
                     <button className="action-btn follow-up">Follow Up</button>
                   </div>
                 </div>
-              ))}
+              ))} 
             </div>
           </section>
         </div>
@@ -529,106 +533,116 @@ function JobSeekerDashboard() {
       )}
       
       {activeTab === 'jobs' && (
-  <div className="tab-content">
-    <section className="jobs-section">
-      <div className="section-header">
-        <h3>Available Jobs</h3>
-        <p>Browse all posted jobs and find your perfect match</p>
-      </div>
-
-      {jobs.length === 0 ? (
-        <div className="no-jobs-message">
-          <Briefcase size={48} className="no-jobs-icon" />
-          <h4>No jobs available yet</h4>
-          <p>Check back later for new job postings</p>
-        </div>
-      ) : (
-        <div className="jobs-grid">
-          {jobs.map((job) => (
-            <div key={job.id} className="job-listing-card">
-
-              {/* Job Title + Type */}
-              <div className="job-listing-header">
-                <h4>{job.title}</h4>
-                <span className="job-type-badge">{job.type || "N/A"}</span>
-              </div>
-
-              {/* Company + Location */}
-              <div className="job-listing-company">
-                <p>{job.company || "Unknown Company"}</p>
-                <span className="job-location">
-                  {job.location || "Location not provided"}
-                </span>
-              </div>
-
-              {/* Salary */}
-              {job.salary && (
-                <div className="job-salary">
-                  <span>{job.salary}</span>
-                </div>
-              )}
-
-              {/* Description Preview */}
-              {job.description && (
-                <div className="job-description-preview">
-                  <p>{job.description.substring(0, 120)}...</p>
-                </div>
-              )}
-
-              {/* Skills — Safely rendered */}
-              <div className="job-skills-preview">
-                {(Array.isArray(job.skills)
-                  ? job.skills
-                  : typeof job.skills === "string"
-                  ? job.skills.split(",")
-                  : []
-                )
-                  .slice(0, 3)
-                  .map((skill, i) => (
-                    <span key={i} className="skill-tag">
-                      {skill.trim()}
-                    </span>
-                  ))}
-
-                {(!job.skills || job.skills.length === 0) && (
-                  <span className="no-skills">No skills added</span>
-                )}
-              </div>
-
-              {/* Footer Actions */}
-              <div className="job-listing-footer">
-                <div className="job-meta">
-                  <span className="posted-date">
-                    Posted: {formatPostedDate(job.created_at)}
-                  </span>
-                  <span className="applicants">
-                    {job.applicants || 0} applicants
-                  </span>
-                </div>
-
-                <div className="job-actions">
-                  <button
-                    onClick={() => navigate(`/job-details/${job.id}`)}
-                    className="view-job-btn"
-                  >
-                    View Details
-                  </button>
-                  <button
-                    onClick={() => handleQuickApply(job.id, job.title)}
-                    className="quick-apply-btn"
-                  >
-                    Quick Apply
-                  </button>
-                </div>
-              </div>
-
+        <div className="tab-content">
+          <section className="jobs-section">
+            <div className="section-header">
+              <h3>Available Jobs</h3>
+              <p>Browse all posted jobs and find your perfect match</p>
             </div>
-          ))}
+
+            {/* ======= NEW: External jobs list (Remotive) =======
+                This renders external jobs fetched by your ExternalAvailableJobs component.
+                It is intentionally added ABOVE the existing internal jobs listing
+                so previous logic/flow is preserved.
+            */}
+            <div className="external-jobs-wrapper" style={{ marginBottom: 20 }}>
+              <ExternalAvailableJobs maxItems={6} />
+            </div>
+            {/* =================================================== */}
+
+            {jobs.length === 0 ? (
+              <div className="no-jobs-message">
+                <Briefcase size={48} className="no-jobs-icon" />
+                <h4>No jobs available yet</h4>
+                <p>Check back later for new job postings</p>
+              </div>
+            ) : (
+              <div className="jobs-grid">
+                {jobs.map((job) => (
+                  <div key={job.id} className="job-listing-card">
+
+                    {/* Job Title + Type */}
+                    <div className="job-listing-header">
+                      <h4>{job.title}</h4>
+                      <span className="job-type-badge">{job.type || "N/A"}</span>
+                    </div>
+
+                    {/* Company + Location */}
+                    <div className="job-listing-company">
+                      <p>{job.company || "Unknown Company"}</p>
+                      <span className="job-location">
+                        {job.location || "Location not provided"}
+                      </span>
+                    </div>
+
+                    {/* Salary */}
+                    {job.salary && (
+                      <div className="job-salary">
+                        <span>{job.salary}</span>
+                      </div>
+                    )}
+
+                    {/* Description Preview */}
+                    {job.description && (
+                      <div className="job-description-preview">
+                        <p>{job.description.substring(0, 120)}...</p>
+                      </div>
+                    )}
+
+                    {/* Skills — Safely rendered */}
+                    <div className="job-skills-preview">
+                      {(Array.isArray(job.skills)
+                        ? job.skills
+                        : typeof job.skills === "string"
+                        ? job.skills.split(",")
+                        : []
+                      )
+                        .slice(0, 3)
+                        .map((skill, i) => (
+                          <span key={i} className="skill-tag">
+                            {skill.trim()}
+                          </span>
+                        ))}
+
+                      {(!job.skills || job.skills.length === 0) && (
+                        <span className="no-skills">No skills added</span>
+                      )}
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="job-listing-footer">
+                      <div className="job-meta">
+                        <span className="posted-date">
+                          Posted: {formatPostedDate(job.created_at)}
+                        </span>
+                        <span className="applicants">
+                          {job.applicants || 0} applicants
+                        </span>
+                      </div>
+
+                      <div className="job-actions">
+                        <button
+                          onClick={() => navigate(`/job-details/${job.id}`)}
+                          className="view-job-btn"
+                        >
+                          View Details
+                        </button>
+                        <button
+                          onClick={() => handleQuickApply(job.id, job.title)}
+                          className="quick-apply-btn"
+                        >
+                          Quick Apply
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       )}
-    </section>
-  </div>
-)}
   
       <div className="ai-assistant">
         <div className="assistant-header">
@@ -665,4 +679,4 @@ function JobSeekerDashboard() {
   );
 }
 
-export default JobSeekerDashboard; 
+export default JobSeekerDashboard;
