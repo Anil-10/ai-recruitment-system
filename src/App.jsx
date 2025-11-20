@@ -1,8 +1,8 @@
+// src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 
 import Header from "./Header";
 import Hero from "./Hero";
@@ -19,6 +19,8 @@ import RecruiterDashboard from "./pages/RecruiterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import JobDetails from "./pages/JobDetails";
+import FindJobs from "./pages/FindJobs";
+
 import JobPortal from "./JobPortal";
 import CreateProfile from "./pages/CreateProfile";
 import AccountVerified from "./pages/AccountVerified";
@@ -74,16 +76,19 @@ function App() {
       <JobProvider>
         <Router>
           <Routes>
-
             {/* 🌍 Public Routes */}
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/account-verified" element={<AccountVerified />} />
-            <Route path="/find-jobs" element={<JobPortal />} />
+
+            {/* External + manual jobs page (Find Jobs) */}
+            <Route path="/find-jobs" element={<FindJobs />} />
+
             <Route path="/job-details/:id" element={<JobDetails />} />
 
             {/* 👤 Job Seeker Protected Routes */}
-            <Route path="/jobseeker"
+            <Route
+              path="/jobseeker"
               element={
                 <ProtectedRoute allowedRoles={["jobseeker"]}>
                   <JobSeekerDashboard />
@@ -91,7 +96,8 @@ function App() {
               }
             />
 
-            <Route path="/create-profile"
+            <Route
+              path="/create-profile"
               element={
                 <ProtectedRoute allowedRoles={["jobseeker"]}>
                   <CreateProfile />
@@ -100,7 +106,8 @@ function App() {
             />
 
             {/* 🏢 Recruiter Protected Routes */}
-            <Route path="/recruiter"
+            <Route
+              path="/recruiter"
               element={
                 <ProtectedRoute allowedRoles={["recruiter"]}>
                   <RecruiterDashboard />
@@ -109,7 +116,8 @@ function App() {
             />
 
             {/* ⚙ Admin Protected Routes */}
-            <Route path="/admin"
+            <Route
+              path="/admin"
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <AdminDashboard />
@@ -119,7 +127,6 @@ function App() {
 
             {/* 🔁 Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
-
           </Routes>
         </Router>
       </JobProvider>
@@ -129,6 +136,7 @@ function App() {
 }
 
 export default App;
+
 
 
 

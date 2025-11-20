@@ -1,0 +1,159 @@
+/* frontend/src/styles/external-available-jobs.css */
+
+/* container and attribution */
+.eaj-container { font-family: "Inter", "Helvetica Neue", Arial, sans-serif; padding: 8px 0; }
+.eaj-attribution { font-size: 13px; color: #6b7280; margin-bottom: 10px; }
+.eaj-attribution a { color: #1d4ed8; text-decoration: none; }
+
+/* grid */
+.eaj-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+/* card */
+.eaj-card {
+  border-radius: 12px;
+  border: 1px solid #e6eef9; /* light blue border like screenshot */
+  box-shadow: 0 6px 18px rgba(18, 38, 63, 0.04);
+  background: #ffffff;
+  padding: 16px;
+  display: flex;
+  align-items: stretch;
+  min-height: 260px;
+}
+
+/* inner content to make spacing consistent */
+.eaj-card-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* top row: title + badge */
+.eaj-top-row { display:flex; justify-content:space-between; align-items:flex-start; gap: 8px; }
+.eaj-badge {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 16px;
+  background: #eaf2ff;
+  color: #2563eb;
+  border: 1px solid rgba(37,99,235,0.08);
+}
+
+/* title and company */
+.eaj-title {
+  font-weight: 700;
+  font-size: 18px;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+.eaj-company {
+  font-weight: 600;
+  color: #0b1220;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+.eaj-location {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+/* salary in green */
+.eaj-salary {
+  color: #059669; /* green */
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+/* description */
+.eaj-desc {
+  color: #374151;
+  font-size: 14px;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+}
+
+/* tags */
+.eaj-tags { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.eaj-tag {
+  background: #f3f7fb;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #374151;
+  border: 1px solid rgba(99,102,241,0.03);
+}
+
+/* divider */
+.eaj-divider {
+  height: 1px;
+  background: #f3f5f7;
+  margin: 4px 0 8px 0;
+  width: 100%;
+}
+
+/* meta row */
+.eaj-meta-row { display:flex; justify-content:space-between; align-items:center; color:#9aa3ad; font-size:13px; margin-bottom:12px; }
+.eaj-posted {}
+.eaj-applicants {}
+
+/* actions - buttons */
+.eaj-actions { display:flex; gap:12px; margin-top:auto; } /* push buttons to bottom */
+.eaj-btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  background: #eef2ff;
+  color: #1f2937;
+  text-decoration: none;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* primary blue button (View Details) */
+.eaj-btn-primary {
+  background: #2b78ff;
+  color: #fff;
+  border: none;
+  box-shadow: 0 6px 10px rgba(43,120,255,0.08);
+}
+
+/* quick apply green */
+.eaj-btn-apply {
+  background: #10b981;
+  color: #fff;
+  border: none;
+}
+
+/* modal */
+.eaj-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 11, 13, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.eaj-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: min(900px, 96%);
+  max-height: 86vh;
+  overflow: auto;
+  padding: 18px;
+  box-shadow: 0 20px 60px rgba(2,6,23,0.2);
+}
+.eaj-modal-header { display:flex; justify-content:space-between; align-items:center; }
+.eaj-modal-close { background:transparent; border:none; font-size:22px; cursor:pointer; }
+.eaj-modal-body { margin-top: 10px; color:#444; }
+.eaj-modal-actions { display:flex; gap:10px; margin-top:14px; justify-content:flex-end; }
